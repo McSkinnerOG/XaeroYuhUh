@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "xaeronuhuh",
+	"version": "${version}",
+	"name": "XaeroNuhUh",
+	"description": "Disable XaeroMini- / Worldmap",
+	"authors": [
+		"blacklizardcode"
+	],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.blacklizardcode.xaeronuhuh.XaeroNuhUh"
+		],
+		"fabric-datagen": [
+			"com.blacklizardcode.xaeronuhuh.XaeroNuhUhDataGenerator"
+		]
+	},
+	"mixins": [
+		"xaeronuhuh.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {}
+}
