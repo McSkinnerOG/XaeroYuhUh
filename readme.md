@@ -1,4 +1,5 @@
 # XaeroNuhUh
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y21OE0FR)
 
 XaeroNuhUh is a simple server-side utility mod designed to **disable Xaero’s World Map** for all players, regardless of their client settings.  
 Perfect for servers that want fair exploration, no free world info, and a more immersive gameplay experience.
@@ -51,3 +52,5 @@ XaeroNuhUh targets the following mods:
     
 
 Enjoy a fairer adventure!
+
+
