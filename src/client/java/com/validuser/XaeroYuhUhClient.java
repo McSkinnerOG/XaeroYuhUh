@@ -34,22 +34,18 @@ public class XaeroYuhUhClient implements ClientModInitializer {
  // MESSAGE HANDLING
  // ========================================================================
  private static boolean handleIncomingMessage(Text message, String channel, boolean overlay) {
-  // Raw as it comes from the server (including '§')
   String raw = message.getString();
   String rawLower = raw.toLowerCase(Locale.ROOT);
   boolean blocked = shouldBlock(rawLower);
+
   String prefix = blocked ? "§c[BLOCKED]" : "§a[ALLOW]";
   String rawShown = sanitizeForChat(raw);
   String msg = prefix + " §2[" + channel.toUpperCase(Locale.ROOT) + "]§r \"§e" + rawShown + "§r\"";
-  if (CONFIG.verbose) {
-   // Show what the server tried to send
-   sendClientMessage(msg);
-  }
-  if (blocked) {
-   sendClientMessage(msg);
-   return false; // prevent other mods and the chat HUD from seeing it
-  }
-  return true;
+
+  // Show the message if we're verbose OR if it was blocked
+  if (CONFIG.verbose || blocked) { sendClientMessage(msg); }
+  // If blocked, don't allow it through
+  return !blocked;
  }
  private static boolean shouldBlock(String rawLower) {
   // User-configured patterns (substring match)
@@ -59,13 +55,15 @@ public class XaeroYuhUhClient implements ClientModInitializer {
   }
   return false;
  }
+ private static final String CHAT_PREFIX = "§6[Ξ] §r";
  private static void sendClientMessage(String msg) {
   MinecraftClient client = MinecraftClient.getInstance();
   if (client == null || client.inGameHud == null) return;
   client.execute(() ->
     client.inGameHud.getChatHud().addMessage(
-      Text.literal("§6[Ξ] §r" + msg)
-    ));
+      Text.literal(CHAT_PREFIX + msg)
+    )
+  );
  }
  // ========================================================================
  // COMMAND IMPLEMENTATIONS
@@ -118,9 +116,6 @@ public class XaeroYuhUhClient implements ClientModInitializer {
  private static String normalize(String s) {
   return s == null ? "" : s.trim().toLowerCase(Locale.ROOT);
  }
- /**
-  * Replace '§' so it doesn't mess up the chat formatting in our debug output.
-  */
  private static String sanitizeForChat(String raw) {
   if (raw == null || raw.isEmpty()) return "";
   return raw.replace('§', '&');
@@ -162,18 +157,11 @@ public class XaeroYuhUhClient implements ClientModInitializer {
  private static Config createDefaultConfig() {
   Config cfg = new Config();
   cfg.verbose = false;
-  // Plain
-  cfg.blockedSubstrings.add("resetxaero");
-  cfg.blockedSubstrings.add("fairxaero");
-  cfg.blockedSubstrings.add("nominimap");
-  // Special
-  cfg.blockedSubstrings.add("§r§e§s§e§t§x§a§e§r§o");
-  cfg.blockedSubstrings.add("§f§a§i§r§x§a§e§r§o");
-  cfg.blockedSubstrings.add("§n§o§m§i§n§i§m§a§p");
-  // Variants
-  cfg.blockedSubstrings.add("reset xaero");
-  cfg.blockedSubstrings.add("fair xaero");
-  cfg.blockedSubstrings.add("no minimap");
+  Collections.addAll(cfg.blockedSubstrings,
+     "resetxaero", "fairxaero", "nominimap",
+    "§r§e§s§e§t§x§a§e§r§o", "§f§a§i§r§x§a§e§r§o", "§n§o§m§i§n§i§m§a§p",
+    "reset xaero", "fair xaero", "no minimap"
+  );
   return cfg;
  }
  private static void saveConfig() {
@@ -232,15 +220,18 @@ public class XaeroYuhUhClient implements ClientModInitializer {
        return 1;
       }))
       .then(literal("help").executes(ctx -> {
-       sendClientMessage("Commands:");
-       sendClientMessage("  /xaeroyuhuh verbose  - toggle verbose logging of all server messages");
-       sendClientMessage("  /xaeroyuhuh add <text>  - add a substring to block (case-insensitive)");
-       sendClientMessage("  /xaeroyuhuh remove <text>  - remove a substring from the block list");
-       sendClientMessage("  /xaeroyuhuh list  - show current block patterns");
+       sendHelp();
        return 1;
       }))
   ));
   LOGGER.info("[XaeroYuhUh] Initialized.");
+ }
+ private static void sendHelp() {
+  sendClientMessage("Commands:");
+  sendClientMessage("  /xaeroyuhuh verbose  - toggle verbose logging of all server messages");
+  sendClientMessage("  /xaeroyuhuh add <text>  - add a substring to block (case-insensitive)");
+  sendClientMessage("  /xaeroyuhuh remove <text>  - remove a substring from the block list");
+  sendClientMessage("  /xaeroyuhuh list  - show current block patterns");
  }
  public static class Config {
   public boolean verbose = false;
