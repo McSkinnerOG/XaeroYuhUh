@@ -1,13 +1,14 @@
 # XaeroYuhUh
-
-XaeroYuhUh is a simple client-side utility mod designed to **disable XaeroNuhUh's** attempts at disabling your mini/world-map, regardless of the server settings.  
+XaeroYuhUh is a simple client-side utility mod designed to stop server-side attempts at disabling your client-side mods.  
 Perfect for clients that want control of what they use on their own client, and a more immersive gameplay experience ;).
 
 ## ✨ Features
-- Fully **client-enforced** disabling/bypassing of:
-  - **XaeroNuhUh**
-- Works automatically when joining a server. 
+- Fully **client-side** disabling/bypassing of server messages:
+    - **Chat**
+    - **Game**
+- Works automatically when joining a server.
 - Lightweight, plug-and-play.
+- Customizable server message block-list.
 
 ## 🛠️ Added Commands
 XaeroYuhUh introduces a few commands you can use:
@@ -23,34 +24,29 @@ XaeroYuhUh introduces a few commands you can use:
 ### Example Commands
 ```mcfunction
 /xaeroyuhuh verbose  - toggle verbose logging of all server messages 
-/xaeroyuhuh add <text>  - add a string to block (case-insensitive) 
-/xaeroyuhuh remove <text>  - remove a string from the block list 
-/xaeroyuhuh list  - show current block patterns 
+/xaeroyuhuh add <text>  - add a string to blocked message list  (case-insensitive) 
+/xaeroyuhuh remove <text>  - remove a string from the blocked message list 
+/xaeroyuhuh list  - show current blocked message list  
 /xaeroyuhuh help  - show list of commands 
 ```
 
-## 📦 Supported Mods
-
-XaeroYuhUh targets the following mod:
+## 📦 Out Of The Box Supported Mods
 
 -   XaeroNuhUh GitHub: [https://github.com/blacklizardcode/XaeroNuhUh](https://github.com/blacklizardcode/XaeroNuhUh)
-    
+
 -   XaeroNuhUh Modrinth: [https://modrinth.com/mod/xaeronuhuh](https://modrinth.com/mod/xaeronuhuh)
-    
+
 
 ## 📀 Installation
 
 1.  Drop **XaeroYuhUh** into your client's `mods/` folder.
-    
-2.  Restart the client.  
+
+2.  Restart the client.
 
 ## 📌 Notes
 
--   This mod is **client-side only**—players do not need to install it.
-    
--   Works out of the box; no config required but available!
-    
+-   This mod is **client-side only** other—players do not need to install it.
+
+-   Works out of the box; no config required but available if wanted/required!
 
 Enjoy your own adventure!
-
-

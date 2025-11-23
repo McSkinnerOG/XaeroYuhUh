@@ -28,7 +28,6 @@ public class XaeroYuhUhClient implements ClientModInitializer {
  public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
  private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("xaeroyuhuh.json");
- // all lowercase, trimmed
  private static final Set<String> BLOCK_PATTERNS = new HashSet<>();
  private static Config CONFIG;
  // ========================================================================
@@ -41,12 +40,13 @@ public class XaeroYuhUhClient implements ClientModInitializer {
   boolean blocked = shouldBlock(rawLower);
   String prefix = blocked ? "§c[BLOCKED]" : "§a[ALLOW]";
   String rawShown = sanitizeForChat(raw);
+  String msg = prefix + " §2[" + channel.toUpperCase(Locale.ROOT) + "]§r \"§e" + rawShown + "§r\"";
   if (CONFIG.verbose) {
    // Show what the server tried to send
-   sendClientMessage(prefix + " §2[" + channel.toUpperCase(Locale.ROOT) + "]§r \"§e" + rawShown + "§r\"");
+   sendClientMessage(msg);
   }
   if (blocked) {
-   sendClientMessage(prefix + " §2[" + channel.toUpperCase(Locale.ROOT) + "]§r \"§e" + rawShown + "§r\"");
+   sendClientMessage(msg);
    return false; // prevent other mods and the chat HUD from seeing it
   }
   return true;
@@ -58,6 +58,14 @@ public class XaeroYuhUhClient implements ClientModInitializer {
    if (rawLower.contains(pattern)) return true;
   }
   return false;
+ }
+ private static void sendClientMessage(String msg) {
+  MinecraftClient client = MinecraftClient.getInstance();
+  if (client == null || client.inGameHud == null) return;
+  client.execute(() ->
+    client.inGameHud.getChatHud().addMessage(
+      Text.literal("§6[Ξ] §r" + msg)
+    ));
  }
  // ========================================================================
  // COMMAND IMPLEMENTATIONS
@@ -104,6 +112,26 @@ public class XaeroYuhUhClient implements ClientModInitializer {
    sendClientMessage("  §7- §f\"" + pattern + "\"");
   }
  }
+ // ========================================================================
+ // UTILS
+ // ========================================================================
+ private static String normalize(String s) {
+  return s == null ? "" : s.trim().toLowerCase(Locale.ROOT);
+ }
+ /**
+  * Replace '§' so it doesn't mess up the chat formatting in our debug output.
+  */
+ private static String sanitizeForChat(String raw) {
+  if (raw == null || raw.isEmpty()) return "";
+  return raw.replace('§', '&');
+ }
+ private static String sanitizeForLog(String raw) {
+  if (raw == null) return "null";
+  return raw.replace("\n", "\\n").replace("\r", "\\r");
+ }
+ // ========================================================================
+ // CONFIG
+ // ========================================================================
  private static void loadConfig() {
   if (Files.exists(CONFIG_PATH)) {
    try {
@@ -121,16 +149,6 @@ public class XaeroYuhUhClient implements ClientModInitializer {
    saveConfig();
   }
   reloadPatternsFromConfig();
- }
- private static void saveConfig() {
-  try {
-   Files.createDirectories(CONFIG_PATH.getParent());
-   String json = GSON.toJson(CONFIG);
-   Files.writeString(CONFIG_PATH, json, StandardCharsets.UTF_8);
-   LOGGER.info("[XaeroYuhUh] Saved config to {}", CONFIG_PATH);
-  } catch (IOException e) {
-   LOGGER.error("[XaeroYuhUh] Failed to save config!", e);
-  }
  }
  private static void reloadPatternsFromConfig() {
   BLOCK_PATTERNS.clear();
@@ -158,49 +176,15 @@ public class XaeroYuhUhClient implements ClientModInitializer {
   cfg.blockedSubstrings.add("no minimap");
   return cfg;
  }
- // ========================================================================
- // UTILS
- // ========================================================================
- private static String normalize(String s) {
-  return s == null ? "" : s.trim().toLowerCase(Locale.ROOT);
- }
- /**
-  * Remove '§x' formatting codes (like Minecraft does when rendering).
-  */
- private static String stripFormatting(String raw) {
-  if (raw == null || raw.isEmpty()) return "";
-
-  StringBuilder out = new StringBuilder(raw.length());
-  int len = raw.length();
-
-  for (int i = 0; i < len; i++) {
-   char c = raw.charAt(i);
-   if (c == '§' && i + 1 < len) {  // skip next safe
-    i++;
-   } else {
-    out.append(c);
-   }
+ private static void saveConfig() {
+  try {
+   Files.createDirectories(CONFIG_PATH.getParent());
+   String json = GSON.toJson(CONFIG);
+   Files.writeString(CONFIG_PATH, json, StandardCharsets.UTF_8);
+   LOGGER.info("[XaeroYuhUh] Saved config to {}", CONFIG_PATH);
+  } catch (IOException e) {
+   LOGGER.error("[XaeroYuhUh] Failed to save config!", e);
   }
-  return out.toString();
- }
- /**
-  * Replace '§' so it doesn't mess up the chat formatting in our debug output.
-  */
- private static String sanitizeForChat(String raw) {
-  if (raw == null || raw.isEmpty()) return "";
-  return raw.replace('§', '&');
- }
- private static String sanitizeForLog(String raw) {
-  if (raw == null) return "null";
-  return raw.replace("\n", "\\n").replace("\r", "\\r");
- }
- private static void sendClientMessage(String msg) {
-  MinecraftClient client = MinecraftClient.getInstance();
-  if (client == null || client.inGameHud == null) return;
-  client.execute(() ->
-    client.inGameHud.getChatHud().addMessage(
-      Text.literal("§6[Ξ] §r" + msg)
-    ));
  }
  @Override
  public void onInitializeClient() {
@@ -258,9 +242,6 @@ public class XaeroYuhUhClient implements ClientModInitializer {
   ));
   LOGGER.info("[XaeroYuhUh] Initialized.");
  }
- // ========================================================================
- // CONFIG
- // ========================================================================
  public static class Config {
   public boolean verbose = false;
   public List<String> blockedSubstrings = new ArrayList<>();
