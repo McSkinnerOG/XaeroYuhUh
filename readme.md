@@ -33,8 +33,9 @@ XaeroYuhUh introduces a few commands you can use:
 ## 📦 Out Of The Box Supported Mods
 
 -   XaeroNuhUh GitHub: [https://github.com/blacklizardcode/XaeroNuhUh](https://github.com/blacklizardcode/XaeroNuhUh)
-
 -   XaeroNuhUh Modrinth: [https://modrinth.com/mod/xaeronuhuh](https://modrinth.com/mod/xaeronuhuh)
+
+-   force-fair-play Modrinth: https://modrinth.com/mod/force-fair-play
 
 
 ## 📀 Installation
